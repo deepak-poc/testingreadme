@@ -109,20 +109,36 @@ To use this workflow, call it from another repository using `workflow_call` and 
 ### `opensource-gov.yml`
 
 **Description:**  
-Manages dependency reviews using GitHub’s dependency submission flow. It checks issue content and state.
+This workflow automates the submission of reviewed open-source dependencies. It is triggered when an existing issue is edited to include a specific tag (<!-- OSG DEPENDENCY-REPORT) and helps ensure that all dependency reviews are tracked and submitted according to internal security policies.
 
 **Usage:**  
-Triggered on edited issues with a specific marker (`<!-- OSG DEPENDENCY REPORT -->`)
+The workflow should be referenced in repositories that want to support automated dependency review submission via issues.
+```
+jobs:
+  mark-reviews:
+    name: Submit Reviewed Dependencies
+    uses: charlesschwab/application-security/.github/workflows/opensource-gov.yml@v5
+    secrets: inherit
+    with:
+      run-mode: 'submit-reviews'
+      issue-number: '${{ github.event.issue.number }}'
+      review-user: '${{ github.event.sender.login }}'
+```
 
 **Inputs:**  
-_None_
+
+| Name           | Description                                              | Required | Example                            |
+| -------------- | -------------------------------------------------------- | -------- | ---------------------------------- |
+| `run-mode`     | Workflow mode – currently supports `submit-reviews` only | Yes    | `submit-reviews`                   |
+| `issue-number` | Issue number containing the dependency review report     | Yes    | `${{ github.event.issue.number }}` |
+| `review-user`  | GitHub username of the person submitting the review      | Yes    | `${{ github.event.sender.login }}` |
 
 **Secrets:**  
 _Inherits default secrets_
 
 **Highlights:**
-- Automatically submits reviewed dependencies
-- Issues must be open and edited
+- Triggered by issue edits with a special dependency report tag.
+- Auto-submits dependency reviews to the Open Source Governance system.
 - Helps fulfill open source governance policy
 
 ---
