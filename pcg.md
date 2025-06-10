@@ -183,27 +183,43 @@ jobs:
 ### `snowflake-deploy-action.yml`
 
 **Description:**  
-Specialized workflow to deploy Snowflake RBAC configurations using environment-specific Makefile targets.
+This reusable workflow automates deployment to Snowflake environments in SAMDA projects. It performs semantic version validation, checks user permissions for production deployments, and executes the Snowflake deploy targets via make.
 
 **Usage:**  
 Invoked via `workflow_call` with necessary environment and version.
+```
+jobs:
+  deploy:
+    uses: charlesschwab/samda-action-workflows/.github/workflows/snowflake-deploy-action.yml@v1
+    with:
+      release_version: '1.2.3'
+      envname: 'sandbox'
+      deploy_options: 'full'
+    secrets: inherit
+
+```
 
 **Inputs:**  
-- `release_version` – Target version
-- `envname` – Target Snowflake environment
-- `deploy_options` – CLI deploy flags
+| Name              | Description                                   | Required | Example   |
+| ----------------- | --------------------------------------------- | -------- | --------- |
+| `release_version` | Semantic version to deploy                    |  Yes    | `1.2.3`   |
+| `envname`         | Target environment (e.g., dev, prod, sandbox) |  Yes    | `sandbox` |
+| `deploy_options`  | Extra flags/options passed to makefile        |  No     | `full` |
 
 **Secrets:**  
-- `WPC_PRO_API_SECRET`
-- `WPC_PRO_API_USER`
-- `WPC_PRO_API_HOST`
-- `GITHUB_TOKEN`
-- `GCP_SERVICE_ACCOUNT_KEY`
+| Name                      | Description                             |
+| ------------------------- | --------------------------------------- |
+| `GCP_SERVICE_ACCOUNT_KEY` | GCP service account credentials in JSON |
+| `WPC_PRO_HOST`            | Snowflake host name for connection      |
+| `WPC_PRO_API_USER`        | API username used for deployment        |
+| `WPC_PRO_API_SECRET`      | API secret key                          |
+| `GITHUB_TOKEN`            | GitHub token for auth operations        |
+
 
 **Highlights:**
-- Ensures prod deploys are only run by admins
+- Prevents unauthorized deployments to prod (enforced via GitHub actor check).
 - Validates semantic version syntax
-- Runs tagged deploy with Google auth
+- Runs the Snowflake deployment using makefile.linux with passed options.
 
 ---
 
