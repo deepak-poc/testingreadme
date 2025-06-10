@@ -25,3 +25,7 @@ _**Please make sure you have the secrets created with the secrets names listed b
 | `BASIC_APP_KEY`           |  GitHub App private key for token generation                         |
 | `PROGET_CA_CERT`          | Internal CA certificate used during build setup                      |
 
+| Repository Variable               |  Purpose / Description                                              |
+| ------------------------- | ---------------------------------------------------------------------| 
+| `GCP_PROJECT_NAME`            | GCP PROJECT ID                 |
+
