@@ -146,21 +146,37 @@ _Inherits default secrets_
 ### `release-action.yml`
 
 **Description:**  
-Automates tagging and release creation after a merge. Calculates new version from config and pushes to GitHub with changelog.
+This reusable workflow automates the release process for SAMDA projects. It handles version extraction, tagging, pre-release validation deployments, and creates an official GitHub release. It is designed to ensure consistency and automation in releasing new application versions.
 
 **Usage:**  
 Triggered after merge to `main`.
+```
+jobs:
+  release:
+    uses: charlesschwab/samda-action-workflows/.github/workflows/release-action.yml@v1
+    with:
+      release_version: '1.2.3'
+    secrets: inherit
+```
 
 **Inputs:**  
-- `release_version` (optional) – Bump version to tag
+
+| Name              | Description                                                                           | Required | Example |
+| ----------------- | ------------------------------------------------------------------------------------- | -------- | ------- |
+| `release_version` | Release version to process (optional, extracted from `.bumpversion.cfg` if not given) | No     | `1.2.3` |
+
 
 **Secrets:**  
-- `GITHUB_TOKEN`
+| Name                      | Description                             |
+| ------------------------- | --------------------------------------- |
+| `GITHUB_TOKEN`            | GitHub token for pushing tags           |
+| `GCP_SERVICE_ACCOUNT_KEY` | GCP credentials in JSON format for auth |
+
 
 **Highlights:**
-- Creates and pushes annotated Git tag
-- Generates GitHub release notes
-- Embeds automated bumpversion parsing
+- Extracts version from .bumpversion.cfg
+- Tags the commit as main-<version> and pushes to the repo
+- Creates a GitHub release with release notes
 
 ---
 
