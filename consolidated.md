@@ -12,6 +12,7 @@ _**Please make sure you have the values ready for the variables listed below.**_
 | `snowflake-deploy-action.yml`      | `release_version` | string | Yes    | Version to deploy (semantic format required)                          | `1.2.3`          |
 |                                    | `envname`         | string |  Yes    | Target environment for deployment                                     | `sandbox`        |
 |                                    | `deploy_options`  | string |  No     | Extra deployment flags for Snowflake                                  | `full`         |
+|                                    | `snowflake_deployment_file` | string | No     |  Snowflake deployment Python File Name                      | `snow_sql_execute`        |
 | `build-action.yml`                 | `build_file`      | string |  Yes    | Makefile to use for the build                                         | `makefile.linux` |
 |                                    | `build_options`   | string |  No     | Additional make options or targets                                    | `setup`      |
 | `stale-pr-notifier.yml`            | *None*            | —      | —        | Scheduled job, no workflow\_call inputs                               | —                |
