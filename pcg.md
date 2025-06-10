@@ -75,35 +75,48 @@ jobs:
 ### `build-action.yml`
 
 ### Description
-This reusable workflow compiles and builds SAMDA projects using make-based automation. It integrates token-based GitHub authentication, submodule injection for shared makefile templates, and supports secure ProGet and GCP integration.
+This reusable workflow automates the build process for SAMDA projects. It supports dynamic build file selection, injects secure secrets, authenticates to GCP, and integrates reusable templates via Git submodules.
 
 ### Usage
 To use this workflow, call it from another repository using `workflow_call` and provide the required inputs and secrets.
 
+```
+jobs:
+  build:
+    uses: charlesschwab/samda-action-workflows/.github/workflows/build-action.yml@v1
+    with:
+      build_file: 'makefile.linux'
+      build_options: 'setup'
+    secrets: inherit
+```
+
 ### Inputs
 
-- **build_file** (string, required): Makefile to be executed for the build (e.g., `makefile.linux`).
-- **build_options** (string, optional): Extra arguments passed to the `make` command.
+| Name            | Description                                | Required | Example          |
+| --------------- | ------------------------------------------ | -------- | ---------------- |
+| `build_file`    | Makefile used for building the application | Yes    | `makefile.linux` |
+| `build_options` | Additional build options/targets           | No     | `setup`      |
+
 
 ### Secrets
 
-- **WPC_PRO_HOST** (required): ProGet host address for internal PyPI resolution.
-- **WPC_PRO_API_USER** (required): Username for ProGet API.
-- **WPC_PRO_API_SECRET** (required): Secret for ProGet API access.
-- **GITHUB_TOKEN** (required): Token for accessing private GitHub repositories.
-- **GCP_SERVICE_ACCOUNT_KEY** (required): JSON key for authenticating with GCP.
-- **PROGET_CA_CERT** (required): Certificate authority file for ProGet SSL.
-- **BASIC_APP_ID** (required): GitHub App ID for generating tokens.
-- **BASIC_APP_KEY** (required): Private key used with GitHub App to sign tokens.
+| Name                      | Description                                        |
+| ------------------------- | -------------------------------------------------- |
+| `WPC_PRO_HOST`            | Hostname for secure platform-related access        |
+| `WPC_PRO_API_USER`        | API user for backend integration                   |
+| `WPC_PRO_API_SECRET`      | API secret key                                     |
+| `GITHUB_TOKEN`            | Default GitHub token                               |
+| `BASIC_APP_ID`            | App ID for generating temporary GitHub App token   |
+| `BASIC_APP_KEY`           | Private key for GitHub App authentication          |
+| `GCP_SERVICE_ACCOUNT_KEY` | GCP credentials for authentication                 |
+| `PROGET_CA_CERT`          | Internal CA cert used during build (for pre-setup) |
 
 ### Highlights
 
-- Cleans old or unused submodules before starting.
-- Dynamically injects reusable makefile templates via submodule.
 - Uses GitHub App authentication for secure token generation.
-- Authenticates and builds using secure credentials and make.
-
-
+- Dynamically loads reusable templates via Git submodules.
+-  Executes customizable Makefile-based builds with passed options.
+  
 ---
 
 ### `opensource-gov.yml`
