@@ -9,22 +9,36 @@ This repository provides reusable GitHub Actions workflows designed to standardi
 ### `validate-action.yml`
 
 **Description:**  
-Ensures proper version bumping practices by comparing `.bumpversion.cfg` and `pyproject.toml`. Validates patch-only version increments.
+This reusable validation workflow ensures version consistency and proper semantic version bumping for pull requests. It checks that:
+
+- The patch version increases by exactly one.
+- The version values match between .bumpversion.cfg and pyproject.toml.
+- The major/minor versions remain unchanged in patch updates
 
 **Usage:**  
-Called via `workflow_call` to validate version update in PRs.
+Used as a workflow_call reusable validation check in PR workflows. It takes no inputs and uses environment context.
+
+```
+jobs:
+  validate:
+    uses: charlesschwab/samda-action-workflows/.github/workflows/validation-action.yml@v1
+    secrets: inherit
+
+```
 
 **Inputs:**  
 _None_
 
 **Secrets:**  
-- `GITHUB_TOKEN`
+| Name           | Description                      |
+| -------------- | -------------------------------- |
+| `GITHUB_TOKEN` | Used to authenticate repo access |
+
 
 **Highlights:**
-- Extracts version info from configuration files
-- Fails if mismatch or invalid bump
-- Enforces patch-only bumps
-
+- Checks version bump between PR branch and main
+- Ensures .bumpversion.cfg and pyproject.toml are in sync
+- Prevents incorrect semantic versioning in pull requests
 ---
 
 ### `deploy-action.yml`
