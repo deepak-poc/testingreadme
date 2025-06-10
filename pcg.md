@@ -30,26 +30,45 @@ _None_
 ### `deploy-action.yml`
 
 **Description:**  
-Handles deployment tasks using provided Makefile targets, optionally supporting custom environment variables or arguments.
+This reusable workflow handles the deployment of SAMDA projects. It checks out a specific release version, authenticates with Google Cloud, and executes a deployment script against a specified environment.
 
 **Usage:**  
 Reusable for structured deploy logic with project-specific commands.
+```
+jobs:
+  deploy-to-dev:
+    uses: ./.github/workflows/your-reusable-workflow-name.yml
+    with:
+      release_version: '1.0.1'
+      envname: 'dev'
+      deploy_script: './scripts/deploy.sh'
+      deploy_options: '--verbose'
+    secrets:
+      GCP_SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SA_KEY_DEV }}
+```
 
 **Inputs:**  
-- `release_version` – The version being deployed
-- `envname` – Target environment (e.g., `dev`, `prod`)
-- `deploy_options` – Optional deploy flags
+
+| Input | Type     | Description                | Required |
+| :-------- | :------- | :------------------------- | :------------------------- |
+| `release_version` | `string` | The release version to deploy (e.g., 1.0.1). It must follow semantic versioning. | Yes |
+| `envname` | `string` | The environment to deploy to (e.g., dev, staging, prod). | Yes |
+| `deploy_script` | `string` | The deployment script to execute. | No|
+| `deploy_options` | `string` | Optional arguments to pass to the deployment script.	 | No |
 
 **Secrets:**  
-- `WPC_PRO_API_SECRET`
-- `WPC_PRO_API_USER`
-- `WPC_PRO_API_HOST`
-- `GITHUB_TOKEN`
+
+| Secrets | Description |
+| :-------- | :------- | 
+| `GITHUB_TOKEN` | This is automatically provided by GitHub. | 
+| `GCP_SERVICE_ACCOUNT_KEY` | The JSON key for the Google Cloud service account used for authentication. |
+
 
 **Highlights:**
-- Validates permission to deploy to prod
-- Ensures semantic versioning
-- Runs environment-specific Makefile deployment
+- **Production Deploy Guard:** Restricts deployments to the prod environment to only repository OWNER or ADMIN users.
+- **Version Validation:** Automatically validates that the release_version input adheres to the semantic versioning format (e.g., X.Y.Z).
+- **Tag-based Checkout**: Checks out the exact code corresponding to the release by using the main-${{ inputs.release_version }} tag.
+- **Dynamic Script Execution:** Runs a specified deployment script, passing in the environment, GCP project ID, and bucket names as arguments.
 
 ---
 
