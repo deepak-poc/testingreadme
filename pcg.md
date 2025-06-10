@@ -226,20 +226,21 @@ jobs:
 ### `stale.yml`
 
 **Description:**  
-Automatically marks and closes stale PRs after inactivity.
+This reusable workflow automatically monitors and flags stale pull requests. It runs on a daily schedule, and marks PRs as stale if they’ve had no activity for 15 days, helping maintain an active and clean development workflow.
 
 **Usage:**  
-Runs daily via scheduled cron job.
+This workflow runs automatically based on a cron schedule. It is not meant to be manually triggered or called via workflow_call.
 
 **Inputs:**  
-_None_
+This workflow does not require any inputs.
 
 **Secrets:**  
 _None_
 
 **Highlights:**
-- Labels PRs as stale after 15 days
-- Closes PRs after 1 additional day
+- Automatically detects and marks stale PRs after 15 days of inactivity.
+- Adds a "Stale" label and comments on the PR with a warning message.
+- Closes stale PRs 1 day after being marked stale.
 - Skips if comments or updates are made
 
 ---
