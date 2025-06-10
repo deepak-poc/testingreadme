@@ -14,14 +14,14 @@ _**Please make sure you have the values ready for the variables listed below.**_
 
 _**Please make sure you have the secrets created with the secrets names listed below.**_
 
-| Secret Name               | Used In Workflows                                                              | Purpose / Description                                              |
-| ------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `GITHUB_TOKEN`            | All                                                                            | GitHub default token for actions, PRs, tagging, etc.               |
-| `GCP_SERVICE_ACCOUNT_KEY` | `validate-action`, `release-action`, `build-action`, `snowflake-deploy-action` | GCP JSON key for authenticating with Google Cloud SDK              |
-| `WPC_PRO_HOST`            | `build-action`, `snowflake-deploy-action`                                      | Internal host for Snowflake or WPC system                          |
-| `WPC_PRO_API_USER`        | `build-action`, `snowflake-deploy-action`                                      | API username for authenticated access                              |
-| `WPC_PRO_API_SECRET`      | `build-action`, `snowflake-deploy-action`                                      | API secret key                                                     |
-| `BASIC_APP_ID`            | `build-action`                                                                 | GitHub App ID for token generation (for secure submodule checkout) |
-| `BASIC_APP_KEY`           | `build-action`                                                                 | GitHub App private key for token generation                        |
-| `PROGET_CA_CERT`          | `build-action`                                                                 | Internal CA certificate used during build setup                    |
+| Secret Name               |  Purpose / Description                                              |
+| ------------------------- | ---------------------------------------------------------------------| 
+| `GITHUB_TOKEN`            |GitHub default token for actions, PRs, tagging, etc.                  |
+| `GCP_SERVICE_ACCOUNT_KEY` |  GCP JSON key for authenticating with Google Cloud SDK               |
+| `WPC_PRO_HOST`            |  Internal host for Snowflake or WPC system                           |
+| `WPC_PRO_API_USER`        |  API username for authenticated access                               |
+| `WPC_PRO_API_SECRET`      | API secret key                                                       |
+| `BASIC_APP_ID`            |  GitHub App ID for token generation (for secure submodule checkout)  |
+| `BASIC_APP_KEY`           |  GitHub App private key for token generation                         |
+| `PROGET_CA_CERT`          | Internal CA certificate used during build setup                      |
 
