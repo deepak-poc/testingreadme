@@ -1,0 +1,20 @@
+resource "azapi_update_resource" "defenderForStorageSetting" {
+  type      = "Microsoft.Security/defenderForStorageSettings@2022-12-01-preview"
+  parent_id = azapi_resource.storageAccount.id
+  name      = "current"
+  body = {
+    properties = {
+      isEnabled = true
+      malwareScanning = {
+        onUpload = {
+          capGBPerMonth = 5000
+          isEnabled     = true
+        }
+      }
+      sensitiveDataDiscovery = {
+        isEnabled = true
+      }
+      overrideSubscriptionLevelSettings = true
+    }
+  }
+}
