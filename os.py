@@ -75,6 +75,15 @@ def main():
         print(f"     Status       : {health.get('status')}")
         print(f"     Nodes        : {health.get('number_of_nodes')}")
         print(f"     Shards       : {health.get('active_shards')}")
+    except urllib.error.HTTPError as e:
+        print(f"[FAIL] Cannot reach OpenSearch at {base_url}")
+        print(f"       HTTP {e.code}: {e.reason}")
+        if e.code == 404:
+            print(f"       404 suggests a reverse proxy or wrong base path.")
+            print(f"       Tried: {base_url}/_cluster/health")
+        elif e.code == 401:
+            print(f"       401 suggests wrong credentials (OPENSEARCH_USER / OPENSEARCH_PASSWORD).")
+        sys.exit(1)
     except urllib.error.URLError as e:
         print(f"[FAIL] Cannot reach OpenSearch at {base_url}")
         print(f"       Reason: {e.reason}")
