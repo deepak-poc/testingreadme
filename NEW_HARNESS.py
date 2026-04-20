@@ -130,8 +130,12 @@ def fetch_indices_from_filestore(harness_host, account_id, org_id,
         dl_url = (f"{harness_host}/ng/api/file-store/files/{file_id}/download"
                   f"?{params}")
         try:
-            raw        = harness_download(dl_url, api_key)
-            definition = json.loads(raw.decode("utf-8"))
+            raw   = harness_download(dl_url, api_key)
+            lines = raw.decode("utf-8").splitlines()
+            # Strip leading DevTools header line e.g. "PUT index-name"
+            if lines and lines[0].strip().upper().startswith(("PUT ", "POST ", "GET ")):
+                lines = lines[1:]
+            definition = json.loads("\n".join(lines))
             indices[index_name] = definition
             print(f"  [FETCHED] {file_name}")
         except Exception as e:
