@@ -98,6 +98,18 @@ def harness_download(url, api_key):
         return r.read()
 
 
+def replace_nmslib(obj):
+    """Recursively replace deprecated nmslib engine with faiss."""
+    if isinstance(obj, dict):
+        return {
+            k: ("faiss" if k == "engine" and v == "nmslib" else replace_nmslib(v))
+            for k, v in obj.items()
+        }
+    if isinstance(obj, list):
+        return [replace_nmslib(i) for i in obj]
+    return obj
+
+
 def fetch_indices_from_filestore(harness_host, account_id, org_id,
                                  project_id, folder_id, api_key):
     """Lists the folder and downloads every .json file.
@@ -136,6 +148,7 @@ def fetch_indices_from_filestore(harness_host, account_id, org_id,
             if lines and lines[0].strip().upper().startswith(("PUT ", "POST ", "GET ")):
                 lines = lines[1:]
             definition = json.loads("\n".join(lines))
+            definition = replace_nmslib(definition)
             indices[index_name] = definition
             print(f"  [FETCHED] {file_name}")
         except Exception as e:
