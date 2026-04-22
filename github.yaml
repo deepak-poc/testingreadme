@@ -30,6 +30,13 @@ jobs:
           pip install --target=".python_packages/lib/site-packages" -r requirements.txt
           popd
 
+      - name: Login to Azure
+        run: |
+          az login --service-principal \
+            --username $AZURE_CLIENT_ID \
+            --password $AZURE_CLIENT_SECRET \
+            --tenant   $AZURE_TENANT_ID
+          az account set --subscription $AZURE_SUBSCRIPTION_ID
 
       - name: Deploy to Azure Function App
         uses: azure/functions-action@v1
