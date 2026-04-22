@@ -69,3 +69,115 @@ resource "azurerm_linux_function_app" "function_app" {
     ENABLE_ORYX_BUILD              = "true"
   }
 }
+
+
+# ===========================================================================
+# Event Grid — Custom Topic
+# ===========================================================================
+resource "azurerm_eventgrid_topic" "main" {
+  name                = var.eventgrid_topic_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  tags                = var.tags
+}
+
+resource "azurerm_eventgrid_event_subscription" "custom_topic_scan_result" {
+  name  = var.sub_custom_scan_name
+  scope = azurerm_eventgrid_topic.main.id
+
+  included_event_types = ["Microsoft.Security.MalwareScanningResult"]
+
+  azure_function_endpoint {
+    function_id                       = "${azurerm_linux_function_app.main.id}/functions/scan_handler_result_resolver"
+    max_events_per_batch              = 1
+    preferred_batch_size_in_kilobytes = 64
+  }
+
+  retry_policy {
+    max_delivery_attempts = 30
+    event_time_to_live    = 1440
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "event_grid_topic" {
+  name                       = var.diag_egt_name
+  target_resource_id         = azurerm_eventgrid_topic.main.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  enabled_log { category = "DeliveryFailures" }
+  enabled_log { category = "PublishFailures" }
+}
+
+# ===========================================================================
+# Event Grid — System Topic on Scanning Storage
+# ===========================================================================
+resource "azurerm_eventgrid_system_topic" "scanning_storage" {
+  name                   = var.eg_system_scanning_name
+  location               = var.location
+  resource_group_name    = var.resource_group_name
+  source_resource_id     = azurerm_storage_account.scanning.id
+  topic_type             = "Microsoft.Storage.StorageAccounts"
+  tags                   = var.tags
+}
+
+resource "azurerm_eventgrid_system_topic_event_subscription" "malware_scan_result" {
+  name                = var.sub_defender_name
+  system_topic        = azurerm_eventgrid_system_topic.scanning_storage.name
+  resource_group_name = var.resource_group_name
+
+  included_event_types = ["Microsoft.Security.MalwareScanningResult"]
+
+  azure_function_endpoint {
+    function_id                       = "${azurerm_linux_function_app.main.id}/functions/scan_handler_result_resolver"
+    max_events_per_batch              = 1
+    preferred_batch_size_in_kilobytes = 64
+  }
+
+  retry_policy {
+    max_delivery_attempts = 30
+    event_time_to_live    = 1440
+  }
+}
+
+resource "azurerm_monitor_diagnostic_setting" "system_topic" {
+  name                       = var.diag_scanning_st_name
+  target_resource_id         = azurerm_eventgrid_system_topic.scanning_storage.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.main.id
+
+  enabled_log { category = "DeliveryFailures" }
+}
+
+# ===========================================================================
+# Event Grid — System Topic on Primary Storage
+# ===========================================================================
+resource "azurerm_eventgrid_system_topic" "primary_storage" {
+  name                   = var.eg_system_primary_name
+  location               = var.location
+  resource_group_name    = var.resource_group_name
+  source_resource_id     = azurerm_storage_account.primary.id
+  topic_type             = "Microsoft.Storage.StorageAccounts"
+  tags                   = var.tags
+}
+
+resource "azurerm_eventgrid_system_topic_event_subscription" "blob_ingest" {
+  name                = var.sub_ingest_name
+  system_topic        = azurerm_eventgrid_system_topic.primary_storage.name
+  resource_group_name = var.resource_group_name
+
+  included_event_types = ["Microsoft.Storage.BlobCreated"]
+
+  subject_filter {
+    subject_begins_with = "/blobServices/default/containers/ingest-files/"
+  }
+
+  azure_function_endpoint {
+    function_id                       = "${azurerm_linux_function_app.main.id}/functions/scan_handler_ingest_function"
+    max_events_per_batch              = 1
+    preferred_batch_size_in_kilobytes = 64
+  }
+
+  retry_policy {
+    max_delivery_attempts = 30
+    event_time_to_live    = 1440
+  }
+}
